@@ -7,8 +7,8 @@ var moment = require('moment');
 // note: all config is optional and the environment variables
 // will be read if the config is not present
 var config = {
-    user: 'canvas', //env var: PGUSER
     database: 'gl_lti_development', //env var: PGDATABASE
+    user: 'canvas', //env var: PGUSER
     password: 'canvas', //env var: PGPASSWORD
     host: 'localhost', // Server hosting the postgres database
     port: 5432, //env var: PGPORT
@@ -35,8 +35,9 @@ pool.connect(function(err, client, done) {
 
     console.log('executing the query to find public profile url');
     var sql_query = "select id, public_profile_url from user_linkedin_profiles " +
-        "where scraped_on is null or DATE(scraped_on) < '" + current_date +
-        "' ORDER BY created_at DESC limit 1";
+        "where profile_status!='opted_out' AND scraped_on is null " +
+        "OR DATE(scraped_on) < '" + current_date + "' " +
+        "ORDER BY created_at DESC limit 1";
 
     query = client.query(sql_query);
     query.on("row", function (row) {
